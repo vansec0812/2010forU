@@ -1084,16 +1084,84 @@ document.addEventListener('DOMContentLoaded', () => {
     captureGardenSnapshot();
   });
 
-  // Modal Bức Thư Tình 20/10
+  // ── MODAL THIỆP TẦNG TẦNG LỚP LỚP (MULTI-LAYER UNPEELING) ──
   const btnLetter = document.getElementById('btn-letter');
   const letterModal = document.getElementById('letterModal');
   const closeLetterBtn = document.getElementById('closeLetterBtn');
   const modalBackdrop = document.getElementById('modalBackdrop');
-  const loveBurstBtn = document.getElementById('loveBurstBtn');
 
+  let currentLayer = 1;
+  const totalLayers = 4;
+
+  // Âm thanh bóc lớp nhẹ nhàng (Web Audio API)
+  function playPeelChime(layerNum) {
+    if (!piano || !piano.ctx) return;
+    try {
+      if (piano.ctx.state === 'suspended') piano.ctx.resume();
+      const now = piano.ctx.currentTime;
+      const osc = piano.ctx.createOscillator();
+      const gain = piano.ctx.createGain();
+      
+      const freqs = [440, 554.37, 659.25, 880]; // A4, C#5, E5, A5
+      const f = freqs[(layerNum - 1) % freqs.length] || 587.33;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, now);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.5, now + 0.2);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+      osc.connect(gain);
+      gain.connect(piano.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.45);
+    } catch (err) {}
+  }
+
+  // Chuyển tầng bóc lớp
+  function goToLayer(target) {
+    if (target < 1 || target > totalLayers) return;
+    currentLayer = target;
+    playPeelChime(target);
+
+    // Cập nhật giao diện các tầng
+    for (let i = 1; i <= totalLayers; i++) {
+      const layerEl = document.getElementById(`layer${i}`);
+      const stepNode = document.getElementById(`stepNode${i}`);
+      const stepConn = document.getElementById(`stepConn${i}`);
+
+      if (!layerEl) continue;
+
+      if (i < target) {
+        layerEl.classList.remove('active');
+        layerEl.classList.add('peeled');
+      } else if (i === target) {
+        layerEl.classList.remove('peeled');
+        layerEl.classList.add('active');
+      } else {
+        layerEl.classList.remove('active', 'peeled');
+      }
+
+      // Cập nhật thanh Stepper
+      if (stepNode) {
+        stepNode.classList.remove('active', 'completed');
+        if (i < target) stepNode.classList.add('completed');
+        else if (i === target) stepNode.classList.add('active');
+      }
+
+      if (stepConn) {
+        if (i < target) stepConn.classList.add('filled');
+        else stepConn.classList.remove('filled');
+      }
+    }
+  }
+
+  // Mở & Đóng modal
   function openLetter() {
     letterModal.classList.add('active');
-    spawnLoveBurst(window.innerWidth / 2, window.innerHeight / 2, 12);
+    goToLayer(1);
+    spawnLoveBurst(window.innerWidth / 2, window.innerHeight / 2, 8);
   }
 
   function closeLetter() {
@@ -1108,11 +1176,109 @@ document.addEventListener('DOMContentLoaded', () => {
   closeLetterBtn.addEventListener('click', closeLetter);
   modalBackdrop.addEventListener('click', closeLetter);
 
-  // Thả tim trong modal
-  loveBurstBtn.addEventListener('click', (e) => {
-    const rect = loveBurstBtn.getBoundingClientRect();
-    spawnLoveBurst(rect.left + rect.width / 2, rect.top, 10);
-  });
+  // Click vào các nốt trên Stepper để nhảy tầng
+  for (let s = 1; s <= totalLayers; s++) {
+    const node = document.getElementById(`stepNode${s}`);
+    if (node) {
+      node.addEventListener('click', () => {
+        goToLayer(s);
+        spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.4, 4);
+      });
+    }
+  }
+
+  // TẦNG 1: Bóc sáp niêm phong
+  const waxSealBtn = document.getElementById('waxSealBtn');
+  const peelBtn1 = document.getElementById('peelBtn1');
+
+  function peelLayer1(e) {
+    const rect = waxSealBtn ? waxSealBtn.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2 };
+    spawnLoveBurst(rect.left + 40, rect.top + 40, 10);
+    goToLayer(2);
+  }
+
+  if (waxSealBtn) waxSealBtn.addEventListener('click', peelLayer1);
+  if (peelBtn1) peelBtn1.addEventListener('click', peelLayer1);
+
+  // TẦNG 2: Mở lớp giấy hoa
+  const peelBtn2 = document.getElementById('peelBtn2');
+  const backBtn2 = document.getElementById('backBtn2');
+  if (peelBtn2) {
+    peelBtn2.addEventListener('click', () => {
+      spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.45, 10);
+      goToLayer(3);
+    });
+  }
+  if (backBtn2) {
+    backBtn2.addEventListener('click', () => goToLayer(1));
+  }
+
+  // TẦNG 3: Mở tầng bí mật cuối cùng
+  const peelBtn3 = document.getElementById('peelBtn3');
+  const backBtn3 = document.getElementById('backBtn3');
+  if (peelBtn3) {
+    peelBtn3.addEventListener('click', () => {
+      spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.5, 12);
+      goToLayer(4);
+    });
+  }
+  if (backBtn3) {
+    backBtn3.addEventListener('click', () => goToLayer(2));
+  }
+
+  // TẦNG 4: Hộp quẻ điều ước & Gấp lại
+  const restartLayersBtn = document.getElementById('restartLayersBtn');
+  const finishBtn = document.getElementById('finishBtn');
+  const drawFortuneBtn = document.getElementById('drawFortuneBtn');
+  const fortuneResult = document.getElementById('fortuneResult');
+
+  const fortuneWishes = [
+    "🌟 Quẻ Đại Cát: Hôm nay mọi điều em làm đều sẽ thuận buồm xuôi gió, gặt hái kết quả ngoài mong đợi!",
+    "🌸 Quẻ Dịu Dàng: Chúc em luôn giữ được nụ cười trong trẻo, rạng rỡ và nhận được thật nhiều sự quan tâm ấm áp!",
+    "🍀 Quẻ May Mắn: Việc học và công việc sẽ cực kỳ hanh thông, mọi bài tập và deadline đều vượt qua nhẹ tênh!",
+    "💖 Quẻ Bình An: Cuộc sống sẽ luôn thật nhẹ nhàng và đối xử với em bằng những điều dễ thương nhất!",
+    "✨ Quẻ Tỏa Sáng: Chúc em luôn tự tin, xinh đẹp và tỏa sáng rực rỡ theo cách của riêng mình!",
+    "☕ Quẻ Thảnh Thơi: Hôm nay em sẽ có một ngày nghỉ ngơi trọn vẹn, không áp lực, chỉ toàn niềm vui!",
+    "🌷 Quẻ Ngọt Ngào: Có một người luôn chúc em mỗi ngày đều bình an, vui vẻ và ngập tràn năng lượng tích cực!",
+    "🎁 Quẻ Bất Ngờ: Hôm nay em sẽ đón nhận một tin vui hoặc một điều bất ngờ cực kỳ đáng yêu!"
+  ];
+
+  let lastFortuneIdx = -1;
+  if (drawFortuneBtn && fortuneResult) {
+    drawFortuneBtn.addEventListener('click', () => {
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * fortuneWishes.length);
+      } while (idx === lastFortuneIdx && fortuneWishes.length > 1);
+      lastFortuneIdx = idx;
+
+      fortuneResult.style.opacity = '0';
+      fortuneResult.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        fortuneResult.textContent = fortuneWishes[idx];
+        fortuneResult.style.transition = 'all 0.3s ease';
+        fortuneResult.style.opacity = '1';
+        fortuneResult.style.transform = 'scale(1)';
+      }, 150);
+
+      const rect = drawFortuneBtn.getBoundingClientRect();
+      spawnLoveBurst(rect.left + rect.width / 2, rect.top, 8);
+    });
+  }
+
+  if (restartLayersBtn) {
+    restartLayersBtn.addEventListener('click', () => {
+      goToLayer(1);
+      spawnLoveBurst(window.innerWidth / 2, window.innerHeight / 2, 8);
+    });
+  }
+
+  if (finishBtn) {
+    finishBtn.addEventListener('click', () => {
+      closeLetter();
+      spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.7, 12);
+    });
+  }
 
   // Đổi tên người nhận khi gõ (lưu vào localStorage)
   const recipientNameEl = document.getElementById('recipientName');

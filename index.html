@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600;1,700&family=Playfair+Display:ital,wght@0,500;0,600;1,400;1,600&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>" />
 </head>
 <body>
@@ -69,48 +69,188 @@
     <span>✨ Chạm hoặc click bất kỳ đâu để gieo thêm một đóa hoa thương</span>
   </aside>
 
-  <!-- Modal Bức Thư Tình 20/10 (Glassmorphism lãng mạn) -->
-  <div class="letter-modal" id="letterModal" role="dialog" aria-modal="true" aria-labelledby="letterTitle">
+  <!-- Modal Bức Thư Tầng Tầng Lớp Lớp (Multi-Layer Unpeeling Card) -->
+  <div class="letter-modal" id="letterModal" role="dialog" aria-modal="true" aria-labelledby="layerTitle3">
     <div class="letter-backdrop" id="modalBackdrop"></div>
-    <div class="letter-card">
-      <button class="close-btn" id="closeLetterBtn" aria-label="Đóng thư">✕</button>
-      
-      <div class="letter-header">
-        <div class="stamp">20·10</div>
-        <div class="letter-tag">Gửi một người bạn đặc biệt ✨</div>
-        <h2 id="letterTitle" class="letter-title">Chúc Mừng Ngày 20/10</h2>
-      </div>
+    
+    <div class="layered-envelope-container">
+      <!-- Nút đóng nhanh -->
+      <button class="close-btn" id="closeLetterBtn" aria-label="Đóng thiệp">✕</button>
 
-      <div class="letter-body">
-        <p class="salutation">
-          Gửi <span class="recipient-name" id="recipientName" contenteditable="true" title="Bấm vào để đổi tên">em</span>,
-        </p>
-        <p>
-          Hôm nay nhân ngày Phụ nữ Việt Nam 20/10, chúc em có một ngày thật nhiều niềm vui, luôn rạng ngời và ngày càng xinh đẹp hơn nữa nhé! 🎉
-        </p>
-        <p>
-          Chúc cho mọi thứ sắp tới với em đều diễn ra thật suôn sẻ, cuộc sống sẽ luôn thật nhẹ nhàng và dịu dàng với em. Đặc biệt là chuyện học hành và công việc sẽ luôn thuận lợi hanh thông, mọi dự định đều đạt được kết quả như em mong đợi.
-        </p>
-        <p>
-          Chúc em luôn có những khoảnh khắc thật bình yên, hạnh phúc bên gia đình và những người thân thương nhất. Mong rằng mỗi ngày của em đều ngập tràn tiếng cười và những điều tích cực, dễ thương.
-        </p>
-        <p class="closing-quote">
-          <em>"Dành bạn, cả một vườn thương.<br/>Chúc em luôn rạng rỡ và an yên trên con đường mình đi."</em>
-        </p>
-      </div>
-
-      <div class="letter-footer">
-        <div class="signature">
-          <span>Chúc em ngày 20/10 thật trọn vẹn ✨</span>
-          <small>20.10.2026</small>
-        </div>
-        <button class="love-burst-btn" id="loveBurstBtn">
-          <span>🌸 Gửi lời chúc tốt đẹp</span>
+      <!-- Thanh chỉ báo tầng tầng lớp lớp (Stepper) -->
+      <div class="stepper-bar" id="stepperBar">
+        <button class="step-node active" id="stepNode1" data-step="1" title="Tầng 1: Niêm phong">
+          <span class="step-circle">1</span>
+          <span class="step-label">Niêm phong</span>
         </button>
+        <div class="step-connector" id="stepConn1"></div>
+        <button class="step-node" id="stepNode2" data-step="2" title="Tầng 2: Giấy hoa">
+          <span class="step-circle">2</span>
+          <span class="step-label">Giấy hoa</span>
+        </button>
+        <div class="step-connector" id="stepConn2"></div>
+        <button class="step-node" id="stepNode3" data-step="3" title="Tầng 3: Bức thiệp">
+          <span class="step-circle">3</span>
+          <span class="step-label">Bức thiệp</span>
+        </button>
+        <div class="step-connector" id="stepConn3"></div>
+        <button class="step-node" id="stepNode4" data-step="4" title="Tầng 4: Bí mật">
+          <span class="step-circle">4</span>
+          <span class="step-label">Bí mật</span>
+        </button>
+      </div>
+
+      <!-- KHUNG CHỨA CÁC TẦNG LỚP -->
+      <div class="layers-stage" id="layersStage">
+
+        <!-- ════════ TẦNG 1: PHONG BÌ SÁP NIÊM PHONG ════════ -->
+        <div class="card-layer layer-1 active" id="layer1">
+          <div class="envelope-outer">
+            <div class="envelope-pattern"></div>
+            <div class="envelope-ribbon-h"></div>
+            <div class="envelope-ribbon-v"></div>
+
+            <!-- Nắp phong bì tam giác 3D -->
+            <div class="envelope-top-flap" id="envelopeTopFlap"></div>
+
+            <!-- Con dấu sáp nổi 3D -->
+            <div class="wax-seal" id="waxSealBtn" title="Chạm để bóc sáp niêm phong">
+              <div class="wax-seal-inner">
+                <span class="wax-icon">🌹</span>
+                <span class="wax-text">20·10</span>
+              </div>
+              <div class="wax-shine"></div>
+            </div>
+
+            <div class="layer1-content">
+              <span class="layer-badge">Tầng 1 / 4 • Món quà gửi bạn</span>
+              <h2 class="layer1-title">Phong Thư Gửi Bạn</h2>
+              <p class="layer1-desc">
+                Một phong thư nhỏ gửi gắm những lời chúc dịu dàng nhất ngày 20/10...
+              </p>
+              <button class="peel-action-btn primary" id="peelBtn1">
+                <span>💌 Bóc dấu niêm phong</span>
+              </button>
+              <p class="layer-hint-text">Chạm vào con dấu sáp hoặc bấm nút để mở lớp đầu tiên</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════ TẦNG 2: LỚP GIẤY MỜ ÉP HOA KHÔ ════════ -->
+        <div class="card-layer layer-2" id="layer2">
+          <div class="vellum-wrap" id="vellumWrap">
+            <div class="vellum-wing left-wing"></div>
+            <div class="vellum-wing right-wing"></div>
+            
+            <div class="vellum-inner-content">
+              <div class="pressed-flower-badge">
+                <span class="flower-icon">🌸</span>
+                <span class="flower-sparkles">✨</span>
+              </div>
+
+              <span class="layer-badge">Tầng 2 / 4 • Giấy hoa giấu kín</span>
+              <h3 class="layer2-title">Từ Một Khu Vườn Đang Thức Giấc...</h3>
+              <p class="layer2-quote">
+                "Mỗi đóa hoa trong khu vườn này nở ra, đều mang theo một lời chúc bình an và rạng ngời dành cho em."
+              </p>
+              
+              <div class="layer-actions">
+                <button class="peel-action-btn secondary" id="backBtn2">
+                  <span>‹ Gấp lại</span>
+                </button>
+                <button class="peel-action-btn primary" id="peelBtn2">
+                  <span>🌸 Mở lớp hoa thơm ›</span>
+                </button>
+              </div>
+              <p class="layer-hint-text">Mở lớp giấy hoa mờ để khám phá lời chúc bên dưới</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════ TẦNG 3: BỨC THIỆP CHÍNH THỨC ════════ -->
+        <div class="card-layer layer-3" id="layer3">
+          <div class="letter-card-inner">
+            <div class="letter-header">
+              <div class="stamp">20·10</div>
+              <div class="letter-tag">Gửi một người bạn đặc biệt ✨</div>
+              <h2 class="letter-title" id="layerTitle3">Chúc Mừng Ngày 20/10</h2>
+            </div>
+
+            <div class="letter-body">
+              <p class="salutation">
+                Gửi <span class="recipient-name" id="recipientName" contenteditable="true" title="Bấm vào để đổi tên">em</span>,
+              </p>
+              <p>
+                Hôm nay nhân ngày Phụ nữ Việt Nam 20/10, chúc em có một ngày thật nhiều niềm vui, luôn rạng ngời và ngày càng xinh đẹp hơn nữa nhé! 🎉
+              </p>
+              <p>
+                Chúc cho mọi thứ sắp tới với em đều diễn ra thật suôn sẻ, cuộc sống sẽ luôn thật nhẹ nhàng và dịu dàng với em. Đặc biệt là chuyện học hành và công việc sẽ luôn thuận lợi hanh thông, mọi dự định đều đạt được kết quả như em mong đợi.
+              </p>
+              <p>
+                Chúc em luôn có những khoảnh khắc thật bình yên, hạnh phúc bên gia đình và những người thân thương nhất. Mong rằng mỗi ngày của em đều ngập tràn tiếng cười và những điều tích cực, dễ thương.
+              </p>
+              <p class="closing-quote">
+                <em>"Dành bạn, cả một vườn thương.<br/>Chúc em luôn rạng rỡ và an yên trên con đường mình đi."</em>
+              </p>
+            </div>
+
+            <div class="letter-footer">
+              <div class="signature">
+                <span>Chúc em ngày 20/10 thật trọn vẹn ✨</span>
+                <small>20.10.2026</small>
+              </div>
+              <div class="layer3-btn-group">
+                <button class="peel-action-btn secondary" id="backBtn3">
+                  <span>‹ Lớp trước</span>
+                </button>
+                <button class="peel-action-btn primary" id="peelBtn3">
+                  <span>✨ Mở tầng bí mật cuối cùng ›</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════ TẦNG 4: THẺ BÍ MẬT & ĐIỀU ƯỚC 20/10 ════════ -->
+        <div class="card-layer layer-4" id="layer4">
+          <div class="secret-polaroid">
+            <div class="polaroid-photo">
+              <div class="polaroid-art">
+                <span class="art-flower">🌹</span>
+                <span class="art-sparkle sparkle-1">✨</span>
+                <span class="art-sparkle sparkle-2">💖</span>
+              </div>
+              <p class="polaroid-caption">
+                "P.S. Nụ cười của em rất xinh, hãy luôn cười thật nhiều và yêu đời như hôm nay nhé! 🌷"
+              </p>
+            </div>
+
+            <!-- Hộp bốc quẻ điều ước may mắn -->
+            <div class="fortune-box" id="fortuneBox">
+              <span class="fortune-badge">🎁 Quẻ May Mắn 20/10 Dành Riêng Cho Em</span>
+              <p class="fortune-result" id="fortuneResult">
+                Bấm nút bên dưới để nhận một quẻ điều ước may mắn cho hôm nay nhé! ✨
+              </p>
+              <button class="draw-fortune-btn" id="drawFortuneBtn">
+                <span>🎲 Rút quẻ may mắn mới</span>
+              </button>
+            </div>
+
+            <div class="layer4-actions">
+              <button class="peel-action-btn secondary" id="restartLayersBtn">
+                <span>🔄 Gấp lại từ đầu</span>
+              </button>
+              <button class="peel-action-btn primary" id="finishBtn">
+                <span>🌸 Trở lại ngắm vườn hoa</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
