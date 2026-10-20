@@ -1,7 +1,4 @@
 {
-  "version": 2,
-  "name": "ca-mot-vuon-thuong-2010",
-  "public": true,
   "cleanUrls": true,
   "headers": [
     {
