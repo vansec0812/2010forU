@@ -1117,10 +1117,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Đổi tên người nhận khi gõ (lưu vào localStorage)
   const recipientNameEl = document.getElementById('recipientName');
   const savedName = localStorage.getItem('recipient_2010');
-  if (savedName) recipientNameEl.textContent = savedName;
+  if (savedName && !savedName.toLowerCase().includes('yêu dấu')) {
+    recipientNameEl.textContent = savedName;
+  } else {
+    recipientNameEl.textContent = 'em';
+    localStorage.removeItem('recipient_2010');
+  }
 
   recipientNameEl.addEventListener('blur', () => {
-    const name = recipientNameEl.textContent.trim() || 'Em';
+    let name = recipientNameEl.textContent.trim() || 'em';
+    name = name.replace(/yêu dấu/gi, '').trim() || 'em';
+    recipientNameEl.textContent = name;
     localStorage.setItem('recipient_2010', name);
   });
 });
