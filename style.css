@@ -454,45 +454,69 @@ html, body {
 .layers-stage {
   position: relative;
   flex: 1;
-  min-height: 460px;
+  min-height: 480px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #f7a8b8 transparent;
-  padding-right: 2px;
+  padding: 4px 2px;
 }
 
+/* TẤT CẢ CÁC TẦNG KHÔNG PHẢI ACTIVE PHẢI BỊ ẨN HOÀN TOÀN (DISPLAY: NONE) */
 .card-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: none !important;
   width: 100%;
   min-height: 100%;
-  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: scale(0.93) translateY(24px);
-  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.25, 1), opacity 0.5s ease, visibility 0.5s ease;
 }
 
+/* CHỈ HIỂN THỊ DUY NHẤT LỚP ĐANG BÓC (ACTIVE) */
 .card-layer.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: scale(1) translateY(0);
-  z-index: 10;
+  display: flex !important;
+  animation: layerUnfoldIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.card-layer.peeled {
-  opacity: 0;
-  visibility: hidden;
+/* HIỆU ỨNG KHI BÓC LỚP BAY ĐI */
+.card-layer.peeling-out {
+  display: flex !important;
   pointer-events: none;
-  transform: scale(1.06) translateY(-40px);
-  z-index: 5;
+  animation: layerPeelOut 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes layerUnfoldIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes layerPeelOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08) translateY(-35px);
+  }
+}
+
+/* Khóa các bước tiếp theo trên stepper khi chưa bóc đến */
+.step-node.locked {
+  cursor: not-allowed;
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+.step-node.locked .step-circle {
+  background: #ded0d6;
+  color: #997380;
 }
 
 /* Badge số tầng */

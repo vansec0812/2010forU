@@ -1091,6 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalBackdrop = document.getElementById('modalBackdrop');
 
   let currentLayer = 1;
+  let maxUnlockedLayer = 1; // Chỉ mở khóa tầng khi người dùng đã click bóc lớp
   const totalLayers = 4;
 
   // Âm thanh bóc lớp nhẹ nhàng (Web Audio API)
@@ -1107,47 +1108,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(f, now);
-      osc.frequency.exponentialRampToValueAtTime(f * 1.5, now + 0.2);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.5, now + 0.18);
 
       gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
       osc.connect(gain);
       gain.connect(piano.ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.45);
+      osc.stop(now + 0.4);
     } catch (err) {}
   }
 
-  // Chuyển tầng bóc lớp
+  // Chuyển tầng hiển thị (chỉ hiện duy nhất tầng đang chọn)
   function goToLayer(target) {
     if (target < 1 || target > totalLayers) return;
     currentLayer = target;
     playPeelChime(target);
 
-    // Cập nhật giao diện các tầng
+    // Cập nhật giao diện các tầng: ẩn hoàn toàn các tầng khác
     for (let i = 1; i <= totalLayers; i++) {
       const layerEl = document.getElementById(`layer${i}`);
       const stepNode = document.getElementById(`stepNode${i}`);
       const stepConn = document.getElementById(`stepConn${i}`);
 
-      if (!layerEl) continue;
-
-      if (i < target) {
-        layerEl.classList.remove('active');
-        layerEl.classList.add('peeled');
-      } else if (i === target) {
-        layerEl.classList.remove('peeled');
-        layerEl.classList.add('active');
-      } else {
-        layerEl.classList.remove('active', 'peeled');
+      if (layerEl) {
+        if (i === target) {
+          layerEl.classList.remove('peeling-out');
+          layerEl.classList.add('active');
+        } else {
+          layerEl.classList.remove('active', 'peeling-out');
+        }
       }
 
-      // Cập nhật thanh Stepper
+      // Cập nhật thanh Stepper: khóa các tầng chưa click bóc đến
       if (stepNode) {
-        stepNode.classList.remove('active', 'completed');
-        if (i < target) stepNode.classList.add('completed');
-        else if (i === target) stepNode.classList.add('active');
+        stepNode.classList.remove('active', 'completed', 'locked');
+        if (i > maxUnlockedLayer) {
+          stepNode.classList.add('locked');
+        } else if (i < target) {
+          stepNode.classList.add('completed');
+        } else if (i === target) {
+          stepNode.classList.add('active');
+        }
       }
 
       if (stepConn) {
@@ -1157,9 +1160,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Mở & Đóng modal
+  // Hàm bóc lớp có hiệu ứng bay lớp cũ rồi mới hiện lớp mới
+  function peelToNextLayer(nextLayer) {
+    const currentEl = document.getElementById(`layer${currentLayer}`);
+    if (currentEl) {
+      currentEl.classList.add('peeling-out');
+    }
+    setTimeout(() => {
+      maxUnlockedLayer = Math.max(maxUnlockedLayer, nextLayer);
+      goToLayer(nextLayer);
+    }, 320);
+  }
+
+  // Mở modal: BẮT BUỘC BẮT ĐẦU TỪ TẦNG 1 (KHÔNG ĐƯỢC NHẢY CÓC)
   function openLetter() {
     letterModal.classList.add('active');
+    maxUnlockedLayer = 1; // Khóa các tầng 2, 3, 4 lại
     goToLayer(1);
     spawnLoveBurst(window.innerWidth / 2, window.innerHeight / 2, 8);
   }
@@ -1176,50 +1192,52 @@ document.addEventListener('DOMContentLoaded', () => {
   closeLetterBtn.addEventListener('click', closeLetter);
   modalBackdrop.addEventListener('click', closeLetter);
 
-  // Click vào các nốt trên Stepper để nhảy tầng
+  // Chỉ cho phép click trên thanh Stepper với các tầng ĐÃ BÓC QUA
   for (let s = 1; s <= totalLayers; s++) {
     const node = document.getElementById(`stepNode${s}`);
     if (node) {
       node.addEventListener('click', () => {
-        goToLayer(s);
-        spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.4, 4);
+        if (s <= maxUnlockedLayer) {
+          goToLayer(s);
+          spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.4, 4);
+        }
       });
     }
   }
 
-  // TẦNG 1: Bóc sáp niêm phong
+  // TẦNG 1: Bắt buộc Click con dấu sáp hoặc nút bóc để sang Tầng 2
   const waxSealBtn = document.getElementById('waxSealBtn');
   const peelBtn1 = document.getElementById('peelBtn1');
 
   function peelLayer1(e) {
     const rect = waxSealBtn ? waxSealBtn.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2 };
     spawnLoveBurst(rect.left + 40, rect.top + 40, 10);
-    goToLayer(2);
+    peelToNextLayer(2);
   }
 
   if (waxSealBtn) waxSealBtn.addEventListener('click', peelLayer1);
   if (peelBtn1) peelBtn1.addEventListener('click', peelLayer1);
 
-  // TẦNG 2: Mở lớp giấy hoa
+  // TẦNG 2: Bắt buộc Click nút bóc lớp giấy hoa để sang Tầng 3
   const peelBtn2 = document.getElementById('peelBtn2');
   const backBtn2 = document.getElementById('backBtn2');
   if (peelBtn2) {
     peelBtn2.addEventListener('click', () => {
       spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.45, 10);
-      goToLayer(3);
+      peelToNextLayer(3);
     });
   }
   if (backBtn2) {
     backBtn2.addEventListener('click', () => goToLayer(1));
   }
 
-  // TẦNG 3: Mở tầng bí mật cuối cùng
+  // TẦNG 3: Bắt buộc Click nút bóc tầng bí mật để sang Tầng 4
   const peelBtn3 = document.getElementById('peelBtn3');
   const backBtn3 = document.getElementById('backBtn3');
   if (peelBtn3) {
     peelBtn3.addEventListener('click', () => {
       spawnLoveBurst(window.innerWidth / 2, window.innerHeight * 0.5, 12);
-      goToLayer(4);
+      peelToNextLayer(4);
     });
   }
   if (backBtn3) {
@@ -1268,6 +1286,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (restartLayersBtn) {
     restartLayersBtn.addEventListener('click', () => {
+      maxUnlockedLayer = 1;
       goToLayer(1);
       spawnLoveBurst(window.innerWidth / 2, window.innerHeight / 2, 8);
     });
