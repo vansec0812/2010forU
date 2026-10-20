@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cả một vườn thương... 🌸 20/10</title>
+  <meta name="description" content="Từ một bông hoa, cả khu vườn đang thức giấc — Quà tặng 20/10 Ngày Phụ Nữ Việt Nam" />
+  <meta property="og:title" content="Cả một vườn thương... 🌸 20/10" />
+  <meta property="og:description" content="Dành bạn, cả một vườn thương. Chúc mừng Ngày Phụ Nữ Việt Nam 20/10" />
+  <meta property="og:type" content="website" />
+
+  <!-- Google Fonts với hỗ trợ tiếng Việt đầy đủ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600;1,700&family=Playfair+Display:ital,wght@0,500;0,600;1,400;1,600&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>" />
+</head>
+<body>
+
+  <!-- Khung Canvas chính hiển thị toàn bộ bầu trời và vườn hoa -->
+  <div id="garden-container">
+    <canvas id="garden-canvas"></canvas>
+  </div>
+
+  <!-- Lớp phủ hiệu ứng ánh nắng & sương sớm -->
+  <div class="sun-glow" aria-hidden="true"></div>
+  <div class="light-ray" aria-hidden="true"></div>
+
+  <!-- Dòng chữ góc trên bên trái y hệt ảnh mẫu: "Dành bạn, cả một vườn thương." -->
+  <header class="top-header">
+    <h1 class="header-quote">Dành bạn, cả một vườn thương.</h1>
+  </header>
+
+  <!-- Dòng thông điệp thơ mộng ở giữa/dưới: "Từ một bông hoa, cả khu vườn đang thức giấc..." -->
+  <div class="awakening-container" id="awakeningContainer">
+    <p class="awakening-quote" id="awakeningQuote">
+      Từ một bông hoa, cả khu vườn đang thức giấc...
+    </p>
+  </div>
+
+  <!-- Thanh công cụ điều khiển tinh tế góc trên bên phải -->
+  <nav class="action-bar" aria-label="Điều khiển">
+    <button id="btn-music" class="pill-btn" title="Bật/Tắt nhạc piano lofi" aria-label="Bật tắt nhạc">
+      <span class="btn-icon">🎵</span>
+      <span class="btn-label">Bật nhạc</span>
+      <span class="music-wave" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+
+    <button id="btn-letter" class="pill-btn primary-pill" title="Mở bức thư gửi bạn" aria-label="Mở thư">
+      <span class="btn-icon">💌</span>
+      <span class="btn-label">Mở thiệp 20/10</span>
+    </button>
+
+    <button id="btn-rebloom" class="pill-btn icon-only" title="Xem hoa nở lại từ đầu" aria-label="Nở lại">
+      <span class="btn-icon">🌸</span>
+    </button>
+
+    <button id="btn-snapshot" class="pill-btn icon-only" title="Tải ảnh vườn hoa làm kỷ niệm" aria-label="Lưu ảnh">
+      <span class="btn-icon">📸</span>
+    </button>
+  </nav>
+
+  <!-- Gợi ý tương tác chạm/click trồng hoa -->
+  <aside class="click-hint" id="clickHint">
+    <span>✨ Chạm hoặc click bất kỳ đâu để gieo thêm một đóa hoa thương</span>
+  </aside>
+
+  <!-- Modal Bức Thư Tình 20/10 (Glassmorphism lãng mạn) -->
+  <div class="letter-modal" id="letterModal" role="dialog" aria-modal="true" aria-labelledby="letterTitle">
+    <div class="letter-backdrop" id="modalBackdrop"></div>
+    <div class="letter-card">
+      <button class="close-btn" id="closeLetterBtn" aria-label="Đóng thư">✕</button>
+      
+      <div class="letter-header">
+        <div class="stamp">20·10</div>
+        <div class="letter-tag">Gửi người con gái tôi thương 💖</div>
+        <h2 id="letterTitle" class="letter-title">Chúc Mừng Ngày Phụ Nữ Việt Nam</h2>
+      </div>
+
+      <div class="letter-body">
+        <p class="salutation">
+          Gửi <span class="recipient-name" id="recipientName" contenteditable="true" title="Bấm vào để đổi tên">Em</span> yêu dấu,
+        </p>
+        <p>
+          Hôm nay là ngày 20/10, ngày để tôn vinh sự dịu dàng, xinh đẹp và rạng rỡ của phái đẹp — và với anh, em chính là bông hoa ngọt ngào và quý giá nhất.
+        </p>
+        <p>
+          Nếu mỗi lời chúc của anh là một nụ mầm, anh muốn gieo tặng em cả một khu vườn ngập tràn hương sắc. Nơi đó có những bông hồng pastel e ấp, có làn gió nhẹ nâng niu nụ cười của em mỗi sớm mai, và có sự ấm áp luôn dõi theo từng bước em đi.
+        </p>
+        <p>
+          Chúc em một ngày 20/10 thật nhiều niềm vui, luôn bình an, hạnh phúc và luôn được yêu thương trọn vẹn như cách em xứng đáng nhận được. Hãy luôn tỏa sáng rạng ngời theo cách của riêng mình nhé!
+        </p>
+        <p class="closing-quote">
+          <em>"Dành bạn, cả một vườn thương.<br/>Từ một bông hoa, cả khu vườn thức giấc vì em."</em>
+        </p>
+      </div>
+
+      <div class="letter-footer">
+        <div class="signature">
+          <span>Thương em thật nhiều 💕</span>
+          <small>20.10.2026</small>
+        </div>
+        <button class="love-burst-btn" id="loveBurstBtn">
+          <span>💖 Thả tim tặng hoa</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
